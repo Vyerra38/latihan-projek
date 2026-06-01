@@ -3,12 +3,6 @@ let isLoginMode = true;
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 let toastTimer;
 
-// ═══════ FUNGSI MODAL & AUTH ═══════
-function openModal() {
-  document.getElementById('login-modal').classList.remove('hidden');
-  document.getElementById('login-modal').classList.add('flex');
-}
-
 function closeModal() {
   document.getElementById('login-modal').classList.remove('flex');
   document.getElementById('login-modal').classList.add('hidden');
