@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>E-EL | Easy English Learn</title>
+  <link rel="stylesheet" href="style_E-EL.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div id="toast"></div>
+
+<!-- ═══════════════ LOGIN MODAL ═══════════════ -->
+<div id="login-modal" class="hidden fixed inset-0 z-[9999] bg-slate-900/50 backdrop-blur-sm items-center justify-center p-4">
+  <div class="modal-box bg-white rounded-2xl p-8 w-full max-w-[400px]">
+    <h2 id="modal-title" class="text-2xl font-bold mb-6">LOG <span style="color:var(--orange)">- IN</span></h2>
+    
+    <div id="auth-email-container" class="mb-4 hidden">
+      <label class="block text-sm font-semibold mb-1">Email</label>
+      <input id="auth-email" type="email" placeholder="contoh@email.com" class="w-full p-2 border rounded">
+    </div>
+
+  <div class="mb-4">
+    <label class="block text-sm font-semibold mb-1">Username</label>
+    <input id="login-user" type="text" placeholder="Masukkan username" class="w-full p-2 border rounded">
+  </div>
+
+  <div class="mb-6 relative">
+      <label class="block text-sm font-semibold mb-1">Password</label>
+      <input id="login-pass" type="password" placeholder="••••••••" class="w-full p-2 border rounded pr-10">
+      <button type="button" onclick="togglePassword()" class="absolute right-3 top-[34px] text-slate-400">
+        <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </button>
+    </div>
+
+    <button id="auth-main-btn" onclick="processAuth()" class="w-full bg-orange-500 text-white py-2 rounded">LOG-IN</button>
+    <p id="auth-text" class="text-center text-sm mt-4">
+        Belum punya akun? <span onclick="toggleAuthMode()" class="cursor-pointer font-bold text-orange-500">Daftar di sini</span>
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav id="navbar">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- Logo -->
+    <button onclick="navigate('home')" class="flex items-center gap-3 group outline-none">
+        <div class="nav-logo-container">
+            <img src="logo_eel.png" alt="E-EL Logo" class="nav-logo-img">
+        </div>
+        <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--orange);">
+        EASY-ENGLISH-LEARN
+        </span>
+    </button>
+
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex items-center gap-6">
+      <button onclick="navigate('home')" class="nav-link active" id="nav-home">Home</button>
+      <button onclick="navigate('lessons')" class="nav-link" id="nav-lessons">English Lessons</button>
+      <button onclick="navigate('practice')" class="nav-link" id="nav-practice">Practice Tool</button>
+      <button onclick="navigate('premium')" class="nav-link" id="nav-premium">Premium</button>
+      <button onclick="navigate('contact')" class="nav-link" id="nav-contact">Contact Us</button>
+      <button id="auth-btn" onclick="openModal()" class="btn-login">Login</button>
+    </div>
+    
+    <!-- Auth -->
+    <div class="flex items-center gap-3">
+      <span id="welcome-text" class="hidden text-sm" style="color:#94A3B8;">
+        Welcome, <span style="color:var(--orange);font-weight:700;">Admin</span>
+      </span>
+      <button id="auth-btn" onclick="handleAuth()" class="btn-login">Log In</button>
+      <!-- Hamburger -->
+      <button onclick="toggleMobile()" class="md:hidden text-white ml-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="flex-col gap-1 px-4 pb-3 border-t border-slate-700 mt-1 md:hidden">
+    <button onclick="navigate('home');toggleMobile()" class="nav-link block py-2">Home</button>
+    <button onclick="navigate('lessons');toggleMobile()" class="nav-link block py-2">English Lessons</button>
+    <button onclick="navigate('practice');toggleMobile()" class="nav-link block py-2">Practice Tool</button>
+    <button onclick="navigate('premium');toggleMobile()" class="nav-link block py-2">Premium</button>
+    <button onclick="navigate('contact');toggleMobile()" class="nav-link block py-2">Contact Us</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     PAGE: HOME
+═══════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <!-- HERO -->
+  <section id="hero-section" class="py-20 md:py-28 px-4 relative">
+    <div class="hero-glow"></div>
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+      <div class="fade-up delay-1">
+        <span class="inline-block text-xs font-bold tracking-widest uppercase px-4 py-1 rounded-full mb-6" style="background:rgba(255,107,0,0.15);color:var(--orange);border:1px solid rgba(255,107,0,0.3);">
+          🎯 Micro-Learning Platform
+        </span>
+      </div>
+      <h1 class="fade-up delay-1 text-white leading-tight mb-4" style="font-size:clamp(2rem,6vw,3.8rem);font-weight:800;">
+        Welcome to <span style="color:var(--orange)">E-EL</span><br/>Easy English Learn
+      </h1>
+      <p class="fade-up delay-2 italic mb-6" style="color:var(--orange);font-size:clamp(1rem,2.5vw,1.35rem);font-weight:300;">
+        "Learn to get hired in 60 seconds."
+      </p>
+      <p class="fade-up delay-2 text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10" style="font-size:0.95rem;">
+        E-EL adalah platform pembelajaran bahasa Inggris praktis yang dirancang khusus untuk membantu kamu menguasai persiapan interview kerja tanpa ribet. Lewat metode <strong class="text-white">Micro-Learning Video 1 Menit</strong>, kamu bisa menyerap kosakata profesional, memperbaiki grammar, dan memahami strategi menjawab pertanyaan HRD secara cepat, padat, dan langsung ke intinya. Tonton materinya, gunakan alat latihan interaktifnya, dan raih karier impianmu sekarang!
+      </p>
+      <div class="fade-up delay-3 flex flex-wrap gap-4 justify-center">
+        <button onclick="navigate('lessons')" class="btn-orange text-base px-8 py-3">Mulai Belajar →</button>
+        <button onclick="navigate('practice')" class="px-8 py-3 rounded-8 font-semibold" style="background:transparent;color:white;border:2px solid rgba(255,255,255,0.3);border-radius:8px;cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">Practice Tool</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grad-line"></div>
+
+  <!-- STATS BAR -->
+  <section style="background:white;" class="py-8 px-4">
+    <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--orange);">50+</div>
+        <div class="text-slate-500 text-sm mt-1">Video Materi</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--orange);">1 Min</div>
+        <div class="text-slate-500 text-sm mt-1">Per Video</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--orange);">3</div>
+        <div class="text-slate-500 text-sm mt-1">Kategori Belajar</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--orange);">Free</div>
+        <div class="text-slate-500 text-sm mt-1">Mulai Belajar</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAILY DOSE -->
+  <section class="py-16 px-4" style="background:#F1F5F9;">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="section-title">Daily Dose <span>Challenge</span></h2>
+        <p class="text-slate-500 mt-2">Video 1 menit hari ini. Tonton, serap, dan siapkan dirimu!</p>
+      </div>
+      <div class="daily-dose-box">
+        <div class="flex items-center gap-3 mb-4">
+          <span style="background:var(--orange);color:white;padding:4px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;font-family:'Syne',sans-serif;">🔥 HARI INI</span>
+          <span class="text-slate-500 text-sm" id="daily-date"></span>
+        </div>
+        <h3 class="font-bold text-lg mb-4" style="color:var(--navy);">How to Answer "Tell Me About Yourself"</h3>
+        <!-- Placeholder Video -->
+        <div class="video-embed bg-slate-900 rounded-xl flex items-center justify-center" style="padding-bottom:56.25%;position:relative;">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+            <div style="width:60px;height:60px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 10px rgba(255,107,0,0.15);" onclick="alert('Video player: Demo Placeholder\n\nDalam produksi nyata, ini akan menampilkan video YouTube Shorts atau HTML5 video.')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-7 h-7 ml-1"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <span style="color:#94A3B8;font-size:0.8rem;">▶ Klik untuk memutar (Placeholder)</span>
+            <span style="color:rgba(255,107,0,0.7);font-size:0.75rem;font-weight:600;">⏱ 1:00 min</span>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center justify-between flex-wrap gap-3">
+          <div class="flex gap-2">
+            <span class="tag-badge">Interview Dasar</span>
+            <span style="background:#EFF6FF;color:#3B82F6;padding:2px 10px;border-radius:20px;font-size:0.7rem;font-weight:600;">⏱ 1 Menit</span>
+          </div>
+          <button onclick="navigate('lessons')" class="btn-orange" style="font-size:0.82rem;padding:7px 16px;">Lihat Semua Materi →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="py-16 px-4 bg-white">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="section-title">Cara <span>Kerja</span> E-EL</h2>
+        <p class="text-slate-500 mt-2">3 langkah mudah untuk persiapan interview impianmu</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center p-6 rounded-2xl" style="background:#FFF7F0;border:2px solid rgba(255,107,0,0.1);">
+          <div style="width:56px;height:56px;background:var(--orange);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;" >
+            <span style="color:white;font-size:1.5rem;">📹</span>
+          </div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--navy);margin-bottom:8px;">1. Tonton Video</h3>
+          <p class="text-slate-500 text-sm leading-relaxed">Pilih topik, tonton video micro-learning 1 menit yang padat dan informatif.</p>
+        </div>
+        <div class="text-center p-6 rounded-2xl" style="background:#F0F9FF;border:2px solid rgba(59,130,246,0.1);">
+          <div style="width:56px;height:56px;background:var(--navy);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <span style="color:white;font-size:1.5rem;">💬</span>
+          </div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--navy);margin-bottom:8px;">2. Latihan Jawab</h3>
+          <p class="text-slate-500 text-sm leading-relaxed">Gunakan Practice Tool untuk melatih jawaban dengan metode STAR Method.</p>
+        </div>
+        <div class="text-center p-6 rounded-2xl" style="background:#F0FDF4;border:2px solid rgba(34,197,94,0.1);">
+          <div style="width:56px;height:56px;background:#16A34A;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <span style="color:white;font-size:1.5rem;">🎯</span>
+          </div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--navy);margin-bottom:8px;">3. Raih Karier</h3>
+          <p class="text-slate-500 text-sm leading-relaxed">Percaya diri masuk interview dan dapatkan pekerjaan impianmu!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: ENGLISH LESSONS
+═══════════════════════════════════════ -->
+<div id="page-lessons" class="page">
+  <div style="background:var(--navy);" class="py-12 px-4">
+    <div class="max-w-7xl mx-auto">
+      <span class="text-sm font-semibold tracking-widest uppercase" style="color:var(--orange);">📚 Materi Belajar</span>
+      <h1 class="text-white mt-2" style="font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;">English Lessons</h1>
+      <p class="text-slate-400 mt-2">Video micro-learning 1 menit untuk persiapan interview kerjamu.</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <!-- ADMIN FORM -->
+    <div id="admin-form-section" class="hidden mb-10 p-6 rounded-2xl" style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));border:2px solid rgba(255,107,0,0.3);">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="admin-badge"><span>👑</span> Admin Panel</div>
+        <h2 style="font-family:'Syne',sans-serif;color:white;font-weight:700;font-size:1.1rem;">Tambah Video Materi Baru</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-slate-300 text-sm font-semibold mb-1">Judul Video *</label>
+          <input id="new-title" type="text" placeholder="Contoh: How to Answer 'Tell Me About Yourself'" class="contact-input"/>
+        </div>
+        <div>
+          <label class="block text-slate-300 text-sm font-semibold mb-1">Link Embed YouTube *</label>
+          <input id="new-link" type="text" placeholder="https://www.youtube.com/embed/..." class="contact-input"/>
+        </div>
+        <div>
+          <label class="block text-slate-300 text-sm font-semibold mb-1">Kategori *</label>
+          <select id="new-category" class="contact-input" style="cursor:pointer;">
+            <option value="Interview Dasar">Interview Dasar</option>
+            <option value="Interview Teknis">Interview Teknis</option>
+            <option value="Bahasa Inggris Umum">Bahasa Inggris Umum</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="addVideo()" class="btn-orange">+ Tambah Video</button>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="flex flex-wrap gap-2 mb-8" id="filter-tabs">
+      <button class="filter-tab active" onclick="filterVideos('Semua',this)">Semua</button>
+      <button class="filter-tab" onclick="filterVideos('Interview Dasar',this)">Interview Dasar</button>
+      <button class="filter-tab" onclick="filterVideos('Interview Teknis',this)">Interview Teknis</button>
+      <button class="filter-tab" onclick="filterVideos('Bahasa Inggris Umum',this)">Bahasa Inggris Umum</button>
+    </div>
+
+    <!-- VIDEO GRID -->
+    <div id="video-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <div id="no-videos" class="hidden text-center py-20 text-slate-400">
+      <span style="font-size:3rem;">📭</span>
+      <p class="mt-4 text-lg">Tidak ada video dalam kategori ini.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: PRACTICE TOOL
+═══════════════════════════════════════ -->
+<div id="page-practice" class="page">
+  <div style="background:var(--navy);" class="py-12 px-4">
+    <div class="max-w-7xl mx-auto">
+      <span class="text-sm font-semibold tracking-widest uppercase" style="color:var(--orange);">🛠 Alat Latihan</span>
+      <h1 class="text-white mt-2" style="font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;">Practice Tool</h1>
+      <p class="text-slate-400 mt-2">Latih kemampuan bahasa Inggrismu dengan alat interaktif di bawah ini.</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-12 space-y-12">
+
+    <!-- 1. QUESTION GENERATOR -->
+    <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+      <div class="flex items-center gap-3 mb-2">
+        <span style="font-size:1.8rem;">🎲</span>
+        <h2 class="section-title">Interview Question <span>Generator</span></h2>
+      </div>
+      <p class="text-slate-500 mb-6">Klik tombol di bawah untuk mendapatkan pertanyaan interview acak. Latih jawaban kamu!</p>
+      <div id="question-display" class="mb-6">
+        <span style="color:#94A3B8;font-style:italic;">Klik tombol di bawah untuk generate pertanyaan...</span>
+      </div>
+      <button onclick="generateQuestion()" class="btn-orange">🎲 Generate New Question</button>
+    </section>
+
+    <!-- 2. STAR METHOD -->
+    <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+      <div class="flex items-center gap-3 mb-2">
+        <span style="font-size:1.8rem;">⭐</span>
+        <h2 class="section-title">STAR Method <span>Template</span></h2>
+      </div>
+      <p class="text-slate-500 mb-6">Tulis draft jawabanmu menggunakan kerangka STAR (Situation, Task, Action, Result).</p>
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="p-5 rounded-xl" style="background:#FFF7F0;border:2px solid rgba(255,107,0,0.2);">
+          <label class="block font-bold mb-1" style="color:var(--orange);font-family:'Syne',sans-serif;">S — Situation</label>
+          <p class="text-slate-500 text-xs mb-2">Ceritakan situasi atau konteks yang relevan. Di mana kamu berada? Apa kondisinya?</p>
+          <textarea id="star-s" class="star-area" placeholder="Contoh: Saat saya bekerja di perusahaan X sebagai marketing intern, kami menghadapi tantangan penurunan engagement media sosial sebesar 40%..."></textarea>
+        </div>
+        <div class="p-5 rounded-xl" style="background:#F0F9FF;border:2px solid rgba(59,130,246,0.2);">
+          <label class="block font-bold mb-1" style="color:#3B82F6;font-family:'Syne',sans-serif;">T — Task</label>
+          <p class="text-slate-500 text-xs mb-2">Apa tugas atau tanggung jawab spesifik yang kamu emban dalam situasi tersebut?</p>
+          <textarea id="star-t" class="star-area" placeholder="Contoh: Saya ditugaskan untuk merancang strategi konten baru dan meningkatkan kembali tingkat engagement dalam 30 hari..."></textarea>
+        </div>
+        <div class="p-5 rounded-xl" style="background:#F0FDF4;border:2px solid rgba(34,197,94,0.2);">
+          <label class="block font-bold mb-1" style="color:#16A34A;font-family:'Syne',sans-serif;">A — Action</label>
+          <p class="text-slate-500 text-xs mb-2">Tindakan konkret apa yang kamu ambil? Fokus pada kontribusi pribadimu.</p>
+          <textarea id="star-a" class="star-area" placeholder="Contoh: Saya melakukan riset kompetitor, membuat content calendar, dan mengimplementasikan strategi video shorts..."></textarea>
+        </div>
+        <div class="p-5 rounded-xl" style="background:#FDF4FF;border:2px solid rgba(168,85,247,0.2);">
+          <label class="block font-bold mb-1" style="color:#9333EA;font-family:'Syne',sans-serif;">R — Result</label>
+          <p class="text-slate-500 text-xs mb-2">Apa hasil yang dicapai? Lebih baik jika ada angka/data kuantitatif.</p>
+          <textarea id="star-r" class="star-area" placeholder="Contoh: Engagement meningkat 65% dalam 30 hari, followers bertambah 2000+, dan strategi ini diadopsi sebagai SOP perusahaan..."></textarea>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button onclick="downloadSTAR()" class="btn-orange">📥 Format & Download Answer</button>
+        <button onclick="clearSTAR()" style="background:transparent;border:2px solid #E2E8F0;color:#64748B;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='#94A3B8'" onmouseout="this.style.borderColor='#E2E8F0'">🗑 Clear All</button>
+      </div>
+    </section>
+
+    <!-- 3. VOCABULARY CHEAT SHEET -->
+    <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+      <div class="flex items-center gap-3 mb-2">
+        <span style="font-size:1.8rem;">📖</span>
+        <h2 class="section-title">Vocabulary <span>Cheat Sheet</span></h2>
+      </div>
+      <p class="text-slate-500 mb-6">Power verbs profesional untuk memperkuat CV dan jawaban interview kamu.</p>
+      <div class="overflow-x-auto rounded-xl" style="border:2px solid #E2E8F0;">
+        <table class="w-full vocab-table">
+          <thead>
+            <tr>
+              <th>Power Verb (English)</th>
+              <th>Arti (Bahasa Indonesia)</th>
+              <th>Contoh Penggunaan</th>
+            </tr>
+          </thead>
+          <tbody id="vocab-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: PREMIUM
+═══════════════════════════════════════ -->
+<div id="page-premium" class="page">
+  <div style="background:var(--navy);" class="py-12 px-4">
+    <div class="max-w-7xl mx-auto text-center">
+      <span class="text-sm font-semibold tracking-widest uppercase" style="color:var(--orange);">💎 Membership</span>
+      <h1 class="text-white mt-2" style="font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;">Pilih Paket Kamu</h1>
+      <p class="text-slate-400 mt-2">Mulai gratis, upgrade kapan saja untuk akses penuh.</p>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 py-16">
+    <div class="grid md:grid-cols-2 gap-8 items-start">
+      <!-- FREE -->
+      <div class="pricing-card free">
+        <div class="mb-6">
+          <span class="text-xs font-bold tracking-widest uppercase text-slate-400">Paket</span>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--navy);">Free Account</h2>
+          <div class="mt-3 flex items-end gap-1">
+            <span style="font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--navy);">Rp 0</span>
+            <span class="text-slate-400 mb-2">/bulan</span>
+          </div>
+        </div>
+        <div class="space-y-3 mb-8 flex-1">
+          <div class="flex items-center gap-3 text-sm text-slate-600">
+            <span style="color:#16A34A;font-size:1.1rem;">✓</span> Akses 10 video materi gratis
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-600">
+            <span style="color:#16A34A;font-size:1.1rem;">✓</span> Interview Question Generator
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-600">
+            <span style="color:#16A34A;font-size:1.1rem;">✓</span> STAR Method Template
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-600">
+            <span style="color:#16A34A;font-size:1.1rem;">✓</span> Vocabulary Cheat Sheet Dasar
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-400">
+            <span style="color:#E2E8F0;font-size:1.1rem;">✗</span> Video simulasi industri spesifik
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-400">
+            <span style="color:#E2E8F0;font-size:1.1rem;">✗</span> E-Book "101 Jawaban Interview"
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-400">
+            <span style="color:#E2E8F0;font-size:1.1rem;">✗</span> Mock Interview AI Practice
+          </div>
+        </div>
+        <button style="background:#F1F5F9;color:#64748B;padding:12px;border-radius:10px;font-weight:700;width:100%;border:none;cursor:default;font-family:'Syne',sans-serif;font-size:0.9rem;">Paket Aktif</button>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="pricing-card premium relative">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+          <span style="background:var(--orange);color:white;padding:4px 20px;border-radius:20px;font-size:0.75rem;font-weight:800;font-family:'Syne',sans-serif;white-space:nowrap;">⭐ PALING POPULER</span>
+        </div>
+        <div class="mb-6 mt-4">
+          <span class="text-xs font-bold tracking-widest uppercase" style="color:var(--orange);">Paket</span>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:white;">Premium Membership</h2>
+          <div class="mt-3 flex items-end gap-1">
+            <span style="font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:white;">Rp 79K</span>
+            <span class="text-slate-400 mb-2">/bulan</span>
+          </div>
+        </div>
+        <div class="space-y-3 mb-8 flex-1">
+          <div class="flex items-center gap-3 text-sm text-slate-300">
+            <span style="color:var(--orange);font-size:1.1rem;">✓</span> Semua fitur Free Account
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-300">
+            <span style="color:var(--orange);font-size:1.1rem;">✓</span> Akses penuh <strong class="text-white">50+ video simulasi industri spesifik</strong> (IT, Marketing, Finance)
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-300">
+            <span style="color:var(--orange);font-size:1.1rem;">✓</span> Download E-Book <strong class="text-white">"101 Jawaban Interview Kerja Terbaik"</strong>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-300">
+            <span style="color:var(--orange);font-size:1.1rem;">✓</span> Mock Interview AI Practice (coming soon)
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-300">
+            <span style="color:var(--orange);font-size:1.1rem;">✓</span> Sertifikat Kelulusan Digital
+          </div>
+          <div class="flex items-center gap-3 text-sm text-slate-300">
+            <span style="color:var(--orange);font-size:1.1rem;">✓</span> Priority Support via WhatsApp
+          </div>
+        </div>
+        <button onclick="showToast('🎉 Redirecting ke halaman pembayaran... (Demo)')" class="btn-orange w-full text-center text-base py-3">💎 Upgrade Now</button>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="mt-16">
+      <h2 class="section-title text-center mb-8">FAQ <span>Premium</span></h2>
+      <div class="space-y-3 max-w-2xl mx-auto">
+        <details class="bg-white border border-slate-200 rounded-xl p-4 cursor-pointer" style="transition:all 0.2s;">
+          <summary class="font-bold text-slate-700" style="font-family:'Syne',sans-serif;">Apakah bisa dibatalkan kapan saja?</summary>
+          <p class="text-slate-500 text-sm mt-2 leading-relaxed">Ya! Kamu bisa membatalkan langganan kapan saja tanpa biaya tambahan. Akses premium tetap aktif hingga akhir periode berlangganan.</p>
+        </details>
+        <details class="bg-white border border-slate-200 rounded-xl p-4 cursor-pointer">
+          <summary class="font-bold text-slate-700" style="font-family:'Syne',sans-serif;">Metode pembayaran apa yang tersedia?</summary>
+          <p class="text-slate-500 text-sm mt-2 leading-relaxed">Kami menerima transfer bank, GoPay, OVO, DANA, dan kartu kredit/debit.</p>
+        </details>
+        <details class="bg-white border border-slate-200 rounded-xl p-4 cursor-pointer">
+          <summary class="font-bold text-slate-700" style="font-family:'Syne',sans-serif;">Berapa lama akses setelah upgrade?</summary>
+          <p class="text-slate-500 text-sm mt-2 leading-relaxed">Akses aktif selama 30 hari dan otomatis diperpanjang jika kamu tidak membatalkan.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: CONTACT US
+═══════════════════════════════════════ -->
+<div id="page-contact" class="page">
+  <div style="background:var(--navy);" class="py-12 px-4">
+    <div class="max-w-7xl mx-auto">
+      <span class="text-sm font-semibold tracking-widest uppercase" style="color:var(--orange);">📬 Kontak</span>
+      <h1 class="text-white mt-2" style="font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;">Contact Us</h1>
+      <p class="text-slate-400 mt-2">Ada pertanyaan atau masukan? Kami siap membantu.</p>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 py-16">
+    <div class="grid md:grid-cols-5 gap-10">
+      <!-- FORM -->
+      <div class="md:col-span-3 bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+        <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--navy);margin-bottom:20px;">Kirim Pesan</h2>
+        <div class="space-y-5">
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Lengkap *</label>
+            <input id="contact-name" type="text" placeholder="Nama kamu" class="contact-input"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 mb-1">Email *</label>
+            <input id="contact-email" type="email" placeholder="email@kamu.com" class="contact-input"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 mb-1">Pesan *</label>
+            <textarea id="contact-msg" class="contact-input" rows="5" placeholder="Tulis pesanmu di sini..."></textarea>
+          </div>
+          <button onclick="submitContact()" class="btn-orange w-full text-base py-3">📨 Kirim Pesan</button>
+        </div>
+      </div>
+
+      <!-- SOCIAL -->
+      <div class="md:col-span-2">
+        <div class="mb-8 p-6 rounded-2xl" style="background:var(--navy);">
+          <h3 style="font-family:'Syne',sans-serif;color:white;font-weight:700;margin-bottom:4px;">Info Kontak</h3>
+          <p class="text-slate-400 text-sm mb-4">Tonton konten harian kami di:</p>
+          <div class="space-y-3">
+            <!-- TikTok -->
+            <a href="https://tiktok.com" target="_blank" class="flex items-center gap-3 p-3 rounded-xl transition-all" style="background:rgba(255,255,255,0.05);color:white;text-decoration:none;" onmouseover="this.style.background='rgba(255,107,0,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+              <div style="width:36px;height:36px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🎵</div>
+              <div>
+                <div class="font-bold text-sm" style="font-family:'Syne',sans-serif;">TikTok</div>
+                <div class="text-slate-400 text-xs">@eellearning</div>
+              </div>
+            </a>
+            <!-- Instagram -->
+            <a href="https://instagram.com" target="_blank" class="flex items-center gap-3 p-3 rounded-xl transition-all" style="background:rgba(255,255,255,0.05);color:white;text-decoration:none;" onmouseover="this.style.background='rgba(255,107,0,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+              <div style="width:36px;height:36px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">📸</div>
+              <div>
+                <div class="font-bold text-sm" style="font-family:'Syne',sans-serif;">Instagram</div>
+                <div class="text-slate-400 text-xs">@eellearning</div>
+              </div>
+            </a>
+            <!-- YouTube -->
+            <a href="https://youtube.com" target="_blank" class="flex items-center gap-3 p-3 rounded-xl transition-all" style="background:rgba(255,255,255,0.05);color:white;text-decoration:none;" onmouseover="this.style.background='rgba(255,107,0,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+              <div style="width:36px;height:36px;background:#FF0000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">▶</div>
+              <div>
+                <div class="font-bold text-sm" style="font-family:'Syne',sans-serif;">YouTube</div>
+                <div class="text-slate-400 text-xs">E-EL Easy English Learn</div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="p-5 rounded-2xl" style="background:#FFF7F0;border:2px solid rgba(255,107,0,0.15);">
+          <h3 style="font-family:'Syne',sans-serif;color:var(--navy);font-weight:700;margin-bottom:6px;">Email Langsung</h3>
+          <p class="text-slate-500 text-sm">📧 halo@eel-learn.id</p>
+          <p class="text-slate-500 text-sm mt-1">📱 WhatsApp: +62 812-xxxx-xxxx</p>
+          <p class="text-slate-400 text-xs mt-3">Respon dalam 1×24 jam hari kerja.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="pt-12 pb-6 px-4">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-4 gap-8 pb-10 border-b border-slate-700">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2 mb-3">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--orange);">E-EL</span>
+          <span style="color:#64748B;font-size:0.8rem;">Easy English Learn</span>
+        </div>
+        <p class="text-slate-400 text-sm leading-relaxed max-w-sm">Platform micro-learning bahasa Inggris untuk persiapan interview kerja. Belajar 1 menit sehari, raih karier impian.</p>
+      </div>
+      <div>
+        <h4 style="font-family:'Syne',sans-serif;color:white;font-weight:700;margin-bottom:12px;font-size:0.9rem;">Navigasi</h4>
+        <div class="space-y-2">
+          <button onclick="navigate('home')" class="block text-slate-400 text-sm hover:text-white transition-colors">Home</button>
+          <button onclick="navigate('lessons')" class="block text-slate-400 text-sm hover:text-white transition-colors">English Lessons</button>
+          <button onclick="navigate('practice')" class="block text-slate-400 text-sm hover:text-white transition-colors">Practice Tool</button>
+          <button onclick="navigate('premium')" class="block text-slate-400 text-sm hover:text-white transition-colors">Premium</button>
+          <button onclick="navigate('contact')" class="block text-slate-400 text-sm hover:text-white transition-colors">Contact Us</button>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-family:'Syne',sans-serif;color:white;font-weight:700;margin-bottom:12px;font-size:0.9rem;">Follow Us</h4>
+        <div class="space-y-2">
+          <a href="#" class="block text-slate-400 text-sm hover:text-white transition-colors">🎵 TikTok</a>
+          <a href="#" class="block text-slate-400 text-sm hover:text-white transition-colors">📸 Instagram</a>
+          <a href="#" class="block text-slate-400 text-sm hover:text-white transition-colors">▶ YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="pt-6 flex flex-wrap items-center justify-between gap-4">
+      <p class="text-slate-500 text-sm">© 2025 E-EL Easy English Learn. All rights reserved.</p>
+      <p class="text-slate-600 text-xs">Made with ❤️ for Indonesian job seekers</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script src="js_E-EL.js"></script>
+</body>
+</html>
